@@ -1,0 +1,36 @@
+{
+    "mcpServers": {
+        "fetch": {
+            "command": "uvx",
+            "args": [
+                "mcp-server-fetch"
+            ],
+            "requires_confirmation": [
+                "fetch"
+            ],
+            "enabled": true,
+            "exclude_tools": []
+        },
+        "brave-search": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-brave-search"
+            ],
+            "env": {
+                "BRAVE_API_KEY": "your-brave-api-key"
+            },
+            "requires_confirmation": [
+                "brave_web_search"
+            ]
+        },
+        "youtube": {
+            "command": "uvx",
+            "args": [
+                "--from",
+                "git+https://github.com/adhikasp/mcp-youtube",
+                "mcp-youtube"
+            ]
+        }
+    }
+}
