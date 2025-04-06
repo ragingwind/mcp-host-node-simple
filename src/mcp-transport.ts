@@ -1,8 +1,15 @@
 import fs from 'node:fs/promises';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js';
+import { Experimental_StdioMCPTransport } from 'ai/mcp-stdio';
+import { experimental_createMCPClient, MCPTransport } from 'ai';
 
-export type MCPClientTransport = StdioClientTransport | SSEClientTransport;
+export type SSEMCPTransport = Exclude<
+  Parameters<typeof experimental_createMCPClient>[0]['transport'],
+  MCPTransport
+>;
+
+export type MCPClientTransport =
+  | Experimental_StdioMCPTransport
+  | SSEMCPTransport;
 
 export async function readMCPTransport(
   mcpServerConfig: string
@@ -18,7 +25,7 @@ export async function readMCPTransport(
     const transports = Object.entries<any>(config.mcpServers).reduce(
       (acc, [name, option]) => {
         if (option.command) {
-          acc[name] = new StdioClientTransport({
+          acc[name] = new Experimental_StdioMCPTransport({
             command: option.command,
             args: option.args,
             env: option.env,
@@ -27,7 +34,7 @@ export async function readMCPTransport(
           });
         } else if (option.url) {
           // @FIXME check /sse perfix
-          acc[name] = new SSEClientTransport(new URL(option.url));
+          acc[name] = { type: 'sse', url: option.url } as SSEMCPTransport;
         } else {
           throw new Error('MCP server config has no command or url property.');
         }
